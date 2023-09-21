@@ -1,7 +1,17 @@
 const { BadRequestError } = require("../expressError");
 
-/** Update company data with `partial data`, .
- *input { dataToUpdate, jsToSql } => output { setCols: }
+/** Returns Set Columns portion of SQL query string and parameterized values
+ * takes two objects, data to update and the js variable names as keys with SQL column names as values
+ * ( { dataToUpdate } , { jsToSql } )
+ * =>
+ *  SET COLUMNS and PARAMETERIZED values
+ * { setCols : ` "first_name" : = $1 `, values : [ "John" ] }
+ *
+ * { { firstName : "John", age : 18 } , jsToSql: { firstName : "first_name", age : "age" } }
+ * =>
+ * {  setCols: ` "first_name" = $1 , "age" = $2 `, values : [ "John", 18 ]  }
+ *
+ *
  */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
