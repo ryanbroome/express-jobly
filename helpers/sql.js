@@ -1,17 +1,21 @@
 const { BadRequestError } = require("../expressError");
-
+// TODO update EXAMPLE with better wording
 /** Returns Set Columns portion of SQL query string and parameterized values
- * takes two objects, data to update and the js variable names as keys with SQL column names as values
+ * Input  ( { data to update } , { js variable names as keys : SQL column names as values } )
  * ( { dataToUpdate } , { jsToSql } )
  * =>
- *  SET COLUMNS and PARAMETERIZED values
+ * Output
  * { setCols : ` "first_name" : = $1 `, values : [ "John" ] }
  *
- * { { firstName : "John", age : 18 } , jsToSql: { firstName : "first_name", age : "age" } }
- * =>
- * {  setCols: ` "first_name" = $1 , "age" = $2 `, values : [ "John", 18 ]  }
- *
- *
+ *  EXAMPLE 
+ *     const querySql = `UPDATE users 
+                      SET ${setCols} 
+                      WHERE username = ${usernameVarIdx} // ( $2 )
+                      RETURNING username,
+                                first_name AS "firstName" 
+                                `;
+    const result = await db.query(querySql, [...values, username]);
+    => result.rows[0] === {username : , firstName : "John"}
  */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
