@@ -14,7 +14,6 @@ const companyUpdateSchema = require("../schemas/companyUpdate.json");
 
 const router = new express.Router();
 
-
 /** POST / { company } =>  { company }
  *
  * company should be { handle, name, description, numEmployees, logoUrl }
@@ -28,7 +27,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyNewSchema);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
 
@@ -52,7 +51,32 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
-    const companies = await Company.findAll();
+    const { name, min, max } = req.query;
+    let companies;
+
+    if (name) {
+      if (name && min && !max) {
+        companies = await Company.getNameMin(name, min);
+      } else if (name && !min && max) {
+        companies = await Company.getNameMax(name, max);
+      } else if (name && min && max) {
+        companies = await Company.fullSort(name, min, max);
+      } else {
+        companies = await Company.getPartialName(name);
+      }
+    } else if (min) {
+      if (!name && max) {
+        companies = await Company.range(min, max);
+      }
+      companies = await Company.getMinCompanies(min);
+    } else if (max) {
+      if (!name && !min && max) {
+        companies = await Company.getMaxCompanies(max);
+      }
+    } else {
+      companies = await Company.findAll();
+    }
+
     return res.json({ companies });
   } catch (err) {
     return next(err);
@@ -91,7 +115,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyUpdateSchema);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
 
@@ -115,6 +139,5 @@ router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
     return next(err);
   }
 });
-
 
 module.exports = router;

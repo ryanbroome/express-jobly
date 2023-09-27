@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { BadRequestError, NotFoundError, ExpressError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
@@ -18,26 +18,20 @@ class Company {
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
-          `SELECT handle
+      `SELECT handle
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]
+    );
 
-    if (duplicateCheck.rows[0])
-      throw new BadRequestError(`Duplicate company: ${handle}`);
+    if (duplicateCheck.rows[0]) throw new BadRequestError(`Duplicate company: ${handle}`);
 
     const result = await db.query(
-          `INSERT INTO companies
+      `INSERT INTO companies
            (handle, name, description, num_employees, logo_url)
            VALUES ($1, $2, $3, $4, $5)
            RETURNING handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"`,
-        [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      [handle, name, description, numEmployees, logoUrl]
     );
     const company = result.rows[0];
 
@@ -51,13 +45,14 @@ class Company {
 
   static async findAll() {
     const companiesRes = await db.query(
-          `SELECT handle,
+      `SELECT handle,
                   name,
                   description,
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
-           ORDER BY name`);
+           ORDER BY name`
+    );
     return companiesRes.rows;
   }
 
@@ -71,14 +66,15 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(
-          `SELECT handle,
+      `SELECT handle,
                   name,
                   description,
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]
+    );
 
     const company = companyRes.rows[0];
 
@@ -100,12 +96,10 @@ class Company {
    */
 
   static async update(handle, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+    const { setCols, values } = sqlForPartialUpdate(data, {
+      numEmployees: "num_employees",
+      logoUrl: "logo_url",
+    });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE companies 
@@ -131,16 +125,194 @@ class Company {
 
   static async remove(handle) {
     const result = await db.query(
-          `DELETE
+      `DELETE
            FROM companies
            WHERE handle = $1
            RETURNING handle`,
-        [handle]);
+      [handle]
+    );
     const company = result.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
+
+  // ? rb ADDED START
+
+  /** Given a searchTerm will return array of found company objects with matching partial name - case insensitive, works or throws a NotFoundError if not found
+   *
+   * **/
+
+  static async getPartialName(searchTerm) {
+    // SQL query with $1 parameter
+    const results = await db.query(
+      `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+        FROM companies
+        WHERE name ILIKE ($1)
+        ORDER BY name`,
+      [`%${searchTerm}%`]
+    );
+    // if db returns something => nameCompanies
+    const nameCompanies = results.rows;
+    // if db returns nothing => error "none found", 400
+    if (nameCompanies.length === 0) {
+      throw new NotFoundError(`No companies found with name: ${searchTerm}`);
+    }
+    // returns array of found companies
+    return nameCompanies;
+  }
+
+  /** Given searchTerm & min sorts by partial name with min employees
+   *
+   **/
+  static async getNameMin(searchTerm, min) {
+    // SQL query with $1 parameter
+    const results = await db.query(
+      `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+        FROM companies
+        WHERE num_employees >= ($2)
+        AND name ILIKE ($1)
+        ORDER BY name`,
+      [`%${searchTerm}%`, min]
+    );
+    // if db returns something => nameCompanies
+    const companies = results.rows;
+    // if db returns nothing => error "none found", 400
+    if (companies.length === 0) {
+      throw new NotFoundError(`No companies found with name: ${searchTerm} and min employees ${min}`);
+    }
+    // returns array of found companies
+    return companies;
+  }
+  /** Given searchTerm & max sorts by partial name with max employees
+   *
+   **/
+  static async getNameMax(searchTerm, max) {
+    // SQL query with $1 parameter
+    const results = await db.query(
+      `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+        FROM companies
+        WHERE num_employees <= ($2)
+        AND name ILIKE ($1)
+        ORDER BY name`,
+      [`%${searchTerm}%`, max]
+    );
+    // if db returns something => nameCompanies
+    const companies = results.rows;
+    // if db returns nothing => error "none found", 400
+    if (companies.length === 0) {
+      throw new NotFoundError(`No companies found with name: ${searchTerm} and min employees ${max}`);
+    }
+    // returns array of found companies
+    return companies;
+  }
+
+  /** given a min number, returns companies with at least that many employees
+   *
+   *
+   **/
+  static async getMinCompanies(min) {
+    const results = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+      FROM companies
+      WHERE num_employees >= $1
+      ORDER BY num_employees
+  `,
+      [min]
+    );
+    const minCompanies = results.rows;
+
+    if (minCompanies.length === 0) {
+      throw new NotFoundError(`No companies with minimum of ${min}employees`);
+    }
+    return minCompanies;
+  }
+  /** given a max, returns companies with max employees
+   *
+   **/
+  static async getMaxCompanies(max) {
+    const results = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+      FROM companies
+      WHERE num_employees <= $1
+      ORDER BY num_employees
+  `,
+      [max]
+    );
+    const maxCompanies = results.rows;
+
+    if (maxCompanies.length === 0) {
+      throw new NotFoundError(`No companies with maximum of ${max}employees`);
+    }
+    return maxCompanies;
+  }
+  /** given a min, max returns companies with range min-max employees
+   *
+   **/
+  static async range(min, max) {
+    const results = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+      FROM companies
+      WHERE (num_employees >= $1 AND num_employees <= $2)
+      ORDER BY num_employees
+  `,
+      [min, max]
+    );
+    const rangeCompanies = results.rows;
+
+    if (rangeCompanies.length === 0) {
+      throw new NotFoundError(`No companies with range ${min} - ${max}employees`);
+    }
+    return rangeCompanies;
+  }
+  /** given a min, max and name returns companies with range min-max employees containing searchTerm
+   *
+   **/
+  static async fullSort(searchTerm, min, max) {
+    const results = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+      FROM companies
+      WHERE (num_employees >= $1 AND num_employees <= $2) 
+      AND name ILIKE($3)
+      ORDER BY num_employees
+  `,
+      [min, max, `%${searchTerm}%`]
+    );
+    const fullSortCompanies = results.rows;
+
+    if (fullSortCompanies.length === 0) {
+      throw new NotFoundError(`
+      No companies found with (name = ${searchTerm}) having (${min} - ${max}) employees`);
+    }
+    return fullSortCompanies;
+  }
 }
-
-
+// ! RB added end
 module.exports = Company;

@@ -5,7 +5,9 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
-
+const Company = require("../models/company");
+// const { getPartialName } = require();
+const db = require("../db");
 
 /** Middleware: Authenticate user.
  *
@@ -42,7 +44,7 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
-
+// !rbEND / logic end
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
