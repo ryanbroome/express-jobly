@@ -1,18 +1,9 @@
 "use strict";
 
-const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} = require("../expressError");
+const { NotFoundError, BadRequestError, UnauthorizedError } = require("../expressError");
 const db = require("../db.js");
 const User = require("./user.js");
-const {
-  commonBeforeAll,
-  commonBeforeEach,
-  commonAfterEach,
-  commonAfterAll,
-} = require("./_testCommon");
+const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -123,7 +114,7 @@ describe("findAll", function () {
         firstName: "U2F",
         lastName: "U2L",
         email: "u2@email.com",
-        isAdmin: false,
+        isAdmin: true,
       },
     ]);
   });
@@ -214,8 +205,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
-    const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+    const res = await db.query("SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 

@@ -50,9 +50,8 @@ function ensureLoggedIn(req, res, next) {
 
 function ensureAdmin(req, res, next) {
   try {
-    // //removed !res.locals.user || from below
     if (res.locals.user.isAdmin !== true) {
-      throw new UnauthorizedError();
+      throw new UnauthorizedError("Must be an admin");
     }
     return next();
   } catch (err) {

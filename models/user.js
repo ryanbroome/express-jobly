@@ -237,7 +237,7 @@ class User {
    *
    * Throws NotFoundError if user not found.
    **/
-  // TODO left off here
+  // TODO left off here, would it make sense to make one query across all tables or make two separate queries one to the user one to the jobs? Try both see which one returns faster. Is an API query a query or does it matter how complex the query is cost wise?
   static async get2(username) {
     const userRes = await db.query(
       `SELECT
