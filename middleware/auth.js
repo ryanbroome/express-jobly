@@ -5,9 +5,7 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
-const Company = require("../models/company");
-// const { getPartialName } = require();
-const db = require("../db");
+// const Company = require("../models/company");
 
 /** Middleware: Authenticate user.
  *
@@ -44,8 +42,48 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
-// !rbEND / logic end
+// ? RB added
+/** Middleware to use when user must be is_admin.
+ *
+ * If not, raises Unauthorized.
+ */
+
+function ensureAdmin(req, res, next) {
+  try {
+    // //removed !res.locals.user || from below
+    if (res.locals.user.isAdmin !== true) {
+      throw new UnauthorizedError();
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Middleware to use when user must be the same as creating user
+ *
+ * If not, raises Unauthorized.
+ */
+
+function loggedInUserOrAdmin(req, res, next) {
+  try {
+    if (res.locals.user.username === req.params.username) {
+      return next();
+    }
+    if (res.locals.user.isAdmin === true) {
+      return next();
+    }
+    throw new UnauthorizedError(`Must be same user or admin`);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+// ! RB added
+
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  loggedInUserOrAdmin,
 };

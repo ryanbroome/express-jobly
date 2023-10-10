@@ -30,5 +30,7 @@ CREATE TABLE applications (
     REFERENCES users ON DELETE CASCADE,
   job_id INTEGER
     REFERENCES jobs ON DELETE CASCADE,
+  state BOOLEAN,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (username, job_id)
 );

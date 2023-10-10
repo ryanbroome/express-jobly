@@ -1,8 +1,10 @@
+// TODO need to update this and pattern match company but write custom testing for Job class. Only added line 7 at this point.
 "use strict";
 
 const db = require("../db.js");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const Company = require("./company.js");
+const Job = require("./job.js");
 const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);

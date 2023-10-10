@@ -142,7 +142,7 @@ class Company {
    *
    * **/
 
-  static async getPartialName(searchTerm) {
+  static async getPartial(searchTerm) {
     // SQL query with $1 parameter
     const results = await db.query(
       `SELECT handle,
@@ -313,6 +313,78 @@ class Company {
     }
     return fullSortCompanies;
   }
+
+  // ATTEMPT 1, and it works, just makes two queries, one against company db and a second against the jobs db this might be expensive and costly time wise
+  static async jobs(handle) {
+    const results = await db.query(
+      `
+SELECT 
+      id,
+      title,
+      salary,
+      equity
+FROM 
+      jobs
+WHERE 
+      company_handle = ($1)
+`,
+      [handle]
+    );
+    const companyJobs = results.rows;
+
+    if (companyJobs.length === 0) {
+      throw new NotFoundError(`No jobs found for company ${handle}`);
+    }
+
+    return companyJobs;
+  }
+  // ATTEMPT 2, MANY TO MANY join query, make one query for the company details {handle, name, description, numEmployees, logoUrl, jobs }, jobs =[{id, title, salary, equity}]
+  static async jobs2(handle) {
+    const results = await db.query(
+      `
+SELECT 
+      c.handle, 
+      c.name, 
+      c.description, 
+      c.num_employees AS "numEmployees", 
+      c.logo_url AS "logoUrl",
+      j.id,
+      j.title,
+      j.salary,
+      j.equity
+FROM 
+      companies c
+LEFT JOIN 
+      jobs j
+ON 
+      c.handle = j.company_handle
+WHERE 
+      company_handle = ($1)
+`,
+      [handle]
+    );
+    if (results.rows.length === 0) {
+      throw new NotFoundError(`No results with the handle : ${handle}`);
+    }
+    const company = {
+      handle: results.rows[0].handle,
+      name: results.rows[0].name,
+      description: results.rows[0].description,
+      numEmployees: results.rows[0].numEmployees,
+      logoUrl: results.rows[0].logoUrl,
+    };
+    company.jobs = results.rows.map(function (r) {
+      const job = {
+        id: r.id,
+        title: r.title,
+        salary: r.salary,
+        equity: r.equity,
+      };
+      return job;
+    });
+    return company;
+  }
 }
+
 // ! RB added end
 module.exports = Company;
