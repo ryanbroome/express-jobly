@@ -14,9 +14,6 @@ afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
 /************************************** POST /users */
-// ?Removed line 28, jobs : [ ] // expect.any(Array)
-//? Removed line 28, isAdmin : false
-// ? Removed line 39, jobs : expect.any(Array)
 describe("POST /users", function () {
   test("works for users: create non-admin", async function () {
     const resp = await request(app)

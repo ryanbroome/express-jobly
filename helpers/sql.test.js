@@ -20,7 +20,6 @@ describe("tests sqlForPartialUpdate", function () {
     // badJsToSql = { firstName: "", lastName: "" };
   });
   afterAll(async function () {
-    // ? MENTOR - Unclear why this is necessary, doesn't make sense to me why there are openHandles?
     await db.end();
   });
 

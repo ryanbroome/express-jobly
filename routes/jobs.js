@@ -12,12 +12,6 @@ const adminToken = createToken(adminUser);
 const regToken = createToken(regUser);
 const eddyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZHltdW5zdGEiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjk2MjU4NzI0fQ.g1hc8iY_Njv-yrBeMCB1kCWb2GvJKZ7ZyX3ET8UssX0";
 
-// console.log("=====\\!=====TOKEN VERIFY====/!======");
-// console.log("adminToken => jwt.verify", jwt.verify(adminToken, SECRET_KEY));
-// console.log("adminToken", adminToken);
-// console.log("regToken => jwt.verify", jwt.verify(regToken, SECRET_KEY));
-// console.log("regToken", regToken);
-// console.log("eddyToken", jwt.verify(eddyToken, SECRET_KEY));
 // !rb enD
 // ! DELETE BEFORE MOVING ON
 // const testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlUxIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTY5NTkxNDE4MX0.rxnNxiHyQshWogJkEVxkIdtEqx3rRMoZU7R39o3KIeU";

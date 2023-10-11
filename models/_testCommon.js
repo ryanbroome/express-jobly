@@ -49,9 +49,6 @@ async function commonAfterEach() {
 }
 
 async function commonAfterAll() {
-  // await db.query("DELETE FROM companies");
-  // // noinspection SqlWithoutWhere
-  // await db.query("DELETE FROM users");
   await db.end();
 }
 

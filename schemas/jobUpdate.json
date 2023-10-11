@@ -4,12 +4,13 @@
     "type": "object",
     "default": {},
     "title": "Root Schema",
-    "required": [
-    ],
+    "required": [],
     "properties": {
         "title": {
             "type": "string",
             "default": "",
+            "minLength" : 1,
+            "maxlength" : 20,
             "title": "The title Schema",
             "examples": [
                 "Valet Attendant"

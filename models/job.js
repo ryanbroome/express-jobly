@@ -207,8 +207,6 @@ class Job {
     }
     return jobs;
   }
-
-  static async apply() {}
   // ! RB added end - Job filtering methods
 }
 module.exports = Job;
