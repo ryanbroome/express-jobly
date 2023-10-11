@@ -52,7 +52,7 @@ class User {
    * Throws BadRequestError on duplicates.
    **/
 
-  static async register({ username, password, firstName, lastName, email, isAdmin }) {
+  static async register({ username, password, firstName, lastName, email, isAdmin = false }) {
     const duplicateCheck = await db.query(
       `SELECT username
            FROM users
@@ -97,7 +97,8 @@ class User {
                   email,
                   is_admin AS "isAdmin"
            FROM users
-           ORDER BY username`
+           `
+      //  ORDER BY username
     );
 
     return result.rows;
@@ -247,13 +248,13 @@ class User {
       j.equity,
       j.company_handle,
       a.username AS "App UN",
-      a.job_id,
+      a.job_id AS "App Job ID",
       a.state,
       u.username AS "User UN",
-      u.first_name,
-      u.last_name,
+      u.first_name AS "firstName",
+      u.last_name AS "lastName",
       u.email,
-      u.is_admin
+      u.is_admin AS "isAdmin"
 FROM
       jobs j
 FULL JOIN

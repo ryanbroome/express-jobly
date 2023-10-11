@@ -52,7 +52,6 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
-
     const company = await Company.create(req.body);
     return res.status(201).json({ company });
   } catch (err) {
@@ -114,9 +113,9 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:handle", async function (req, res, next) {
   try {
-    const company = await Company.jobs2(req.params.handle);
-    // const company = await Company.get(req.params.handle);
-    // company.jobs = await Company.jobs(req.params.handle);
+    // const company = await Company.jobs2(req.params.handle);
+    const company = await Company.get(req.params.handle);
+    company.jobs = await Company.jobs(req.params.handle);
     return res.json({ company });
   } catch (err) {
     return next(err);

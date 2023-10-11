@@ -25,7 +25,7 @@ const router = express.Router();
  *
  * !Authorization required: login && admin
  **/
-// ?removed ensureLoggedIn
+
 router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
@@ -128,7 +128,6 @@ router.delete("/:username", ensureLoggedIn, loggedInUserOrAdmin, async function 
  *
  * !Authorization required: loggedInUser || admin
  **/
-// TODO last working on this route
 router.post("/:username/jobs/:id", loggedInUserOrAdmin, async function (req, res, next) {
   try {
     if (req.params.length != 0) {

@@ -330,10 +330,11 @@ WHERE
 `,
       [handle]
     );
-    const companyJobs = results.rows;
+    let companyJobs = results.rows;
 
     if (companyJobs.length === 0) {
-      throw new NotFoundError(`No jobs found for company ${handle}`);
+      companyJobs = [];
+      // throw new NotFoundError(`No jobs found for company ${handle}`);
     }
 
     return companyJobs;
