@@ -1,4 +1,3 @@
-// ?RB ADDED job
 "use strict";
 
 const db = require("../db");
@@ -16,7 +15,6 @@ class Job {
    *
    * Throws BadRequestError if job already in database.
    * */
-  // * REQUIRES TESTING TEST WITH INSOMNIA THEN WRITE TESTS FOR IT
   static async create({ title, salary, equity, company_handle }) {
     const duplicateCheck = await db.query(
       `SELECT title, company_handle
@@ -44,7 +42,6 @@ class Job {
    *
    * Returns [{title, salary, equity, company_handle }, ...]
    * */
-  // * REQUIRES TESTING TEST WITH INSOMNIA THEN WRITE TESTS FOR IT
   static async findAll() {
     const jobsRes = await db.query(
       `SELECT id, title, salary, equity, company_handle
@@ -60,7 +57,6 @@ class Job {
 
    * Throws NotFoundError if not found.
    **/
-  // * REQUIRES TESTING TEST WITH INSOMNIA THEN WRITE TESTS FOR IT
   static async get(id) {
     const jobRes = await db.query(
       `SELECT title, salary, equity, company_handle
@@ -87,7 +83,6 @@ class Job {
    *
    * Throws NotFoundError if not found.
    */
-  // * Done works, test for outliers.
   static async update(id, data) {
     const { setCols, values } = sqlForPartialUpdate(data, {
       /** company_handle : "companyHandle",
@@ -116,7 +111,6 @@ class Job {
    *
    * Throws NotFoundError if job not found.
    **/
-
   static async remove(id) {
     const result = await db.query(
       `DELETE
@@ -130,12 +124,9 @@ class Job {
     if (!job) throw new NotFoundError(`No job with ID: ${id}`);
   }
 
-  // ? rb ADDED START Job filtering methods
-
   /** Given a searchTerm will return array of found jobjects with matching partial title - case insensitive, works or throws a NotFoundError if not found
    *
    * **/
-
   static async getPartial(searchTerm) {
     const results = await db.query(
       `SELECT 
@@ -152,21 +143,21 @@ class Job {
             title`,
       [`%${searchTerm}%`]
     );
-    // if db returns something => jobs
     const jobs = results.rows;
-    // if db returns nothing => error "msg", 400
+
     if (jobs.length === 0) {
       throw new NotFoundError(`No jobs found with title: ${searchTerm}`);
     }
-    // returns array of found jobjects
     return jobs;
   }
 
+  /** Given an array of jobs will filter out jobs that contain an equity value of 0, if no jobs in array will throw an error
+   *
+   * **/
   static async equity(jobs) {
     jobs = jobs.filter(function (row) {
       let equity = +row.equity;
       if (equity > 0) {
-        console.log("row.equity", row.equity);
         return row.equity;
       }
     });
@@ -178,36 +169,38 @@ class Job {
     return jobs;
   }
 
+  /**Given an array of jobs and a salary amount will filter out jobs with less than that amount for Job.salary, if no jobs found throws a NotFoundError
+   *
+   * **/
   static async salary(jobs, salary) {
     jobs = jobs.filter(function (row) {
       return row.salary >= salary;
     });
     if (jobs.length === 0) {
-      throw new NotFoundError(`No jobs found with equity.`);
+      throw new NotFoundError(`No jobs found with min Salary ${salary}.`);
     }
     return jobs;
   }
 
+  /**Given an array of jobs and a req.querywill filter using the above static methods if no jobs found throws a NotFoundError
+   *
+   * **/
   static async filter(jobs, query) {
     const { title, minSalary, hasEquity } = query;
-    console.log("title:", title, "minSalary:", minSalary, "hasEquity", hasEquity);
-    // Possible testing issue with using this.?
     if (title) {
       jobs = await this.getPartial(title);
     } else if (!title) {
       jobs = await this.findAll();
     }
-    // removed await from before Job below
     if (hasEquity != undefined) {
       jobs = await this.equity(jobs);
     }
-    // removed await from before Job below
+
     if (minSalary) {
       jobs = await this.salary(jobs, minSalary);
     }
+
     return jobs;
   }
-  // ! RB added end - Job filtering methods
 }
 module.exports = Job;
-// !RB ADDED END - JOB

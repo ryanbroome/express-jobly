@@ -11,7 +11,6 @@ afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
 /************************************** create */
-
 describe("create", function () {
   const newCompany = {
     handle: "new",
@@ -53,7 +52,6 @@ describe("create", function () {
 });
 
 /************************************** findAll */
-
 describe("findAll", function () {
   test("works: no filter", async function () {
     let companies = await Company.findAll();
@@ -82,8 +80,6 @@ describe("findAll", function () {
     ]);
   });
 });
-
-// ? RB testing add begin
 
 /************************************** findPartial */
 describe("GET companies by partial name", function () {
@@ -293,9 +289,7 @@ describe("GET companies with partial name & range (min-max) employees", function
   });
 });
 
-// ! RB testing end
 /************************************** get */
-
 describe("get", function () {
   test("works", async function () {
     let company = await Company.get("c1");
@@ -319,7 +313,6 @@ describe("get", function () {
 });
 
 /************************************** update */
-
 describe("update", function () {
   const updateData = {
     name: "New",
@@ -401,7 +394,6 @@ describe("update", function () {
 });
 
 /************************************** remove */
-
 describe("remove", function () {
   test("works", async function () {
     await Company.remove("c1");

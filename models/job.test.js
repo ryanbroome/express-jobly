@@ -1,4 +1,3 @@
-// TODO need to update this and pattern match company but write custom testing for Job class. Only added line 7 at this point.
 "use strict";
 
 const db = require("../db.js");
@@ -84,8 +83,6 @@ describe("findAll", function () {
     ]);
   });
 });
-
-// ? RB testing add begin
 
 /************************************** findPartial */
 describe("GET companies by partial name", function () {
@@ -295,7 +292,6 @@ describe("GET companies with partial name & range (min-max) employees", function
   });
 });
 
-// ! RB testing end
 /************************************** get */
 
 describe("get", function () {

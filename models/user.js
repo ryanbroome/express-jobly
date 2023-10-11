@@ -98,7 +98,6 @@ class User {
                   is_admin AS "isAdmin"
            FROM users
            `
-      //  ORDER BY username
     );
 
     return result.rows;

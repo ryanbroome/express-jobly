@@ -15,7 +15,6 @@ class Company {
    *
    * Throws BadRequestError if company already in database.
    * */
-
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
       `SELECT handle
@@ -42,7 +41,6 @@ class Company {
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
-
   static async findAll() {
     const companiesRes = await db.query(
       `SELECT handle,
@@ -63,7 +61,6 @@ class Company {
    *
    * Throws NotFoundError if not found.
    **/
-
   static async get(handle) {
     const companyRes = await db.query(
       `SELECT handle,
@@ -94,7 +91,6 @@ class Company {
    *
    * Throws NotFoundError if not found.
    */
-
   static async update(handle, data) {
     const { setCols, values } = sqlForPartialUpdate(data, {
       numEmployees: "num_employees",
@@ -122,7 +118,6 @@ class Company {
    *
    * Throws NotFoundError if company not found.
    **/
-
   static async remove(handle) {
     const result = await db.query(
       `DELETE
@@ -136,14 +131,10 @@ class Company {
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
 
-  // ? rb ADDED START
-
   /** Given a searchTerm will return array of found company objects with matching partial name - case insensitive, works or throws a NotFoundError if not found
    *
    * **/
-
   static async getPartial(searchTerm) {
-    // SQL query with $1 parameter
     const results = await db.query(
       `SELECT handle,
                 name,
@@ -155,13 +146,13 @@ class Company {
         ORDER BY name`,
       [`%${searchTerm}%`]
     );
-    // if db returns something => nameCompanies
+
     const nameCompanies = results.rows;
-    // if db returns nothing => error "none found", 400
+
     if (nameCompanies.length === 0) {
       throw new NotFoundError(`No companies found with name: ${searchTerm}`);
     }
-    // returns array of found companies
+
     return nameCompanies;
   }
 
@@ -169,7 +160,6 @@ class Company {
    *
    **/
   static async getNameMin(searchTerm, min) {
-    // SQL query with $1 parameter
     const results = await db.query(
       `SELECT handle,
                 name,
@@ -182,20 +172,20 @@ class Company {
         ORDER BY name`,
       [`%${searchTerm}%`, min]
     );
-    // if db returns something => nameCompanies
+
     const companies = results.rows;
-    // if db returns nothing => error "none found", 400
+
     if (companies.length === 0) {
       throw new NotFoundError(`No companies found with name: ${searchTerm} and min employees ${min}`);
     }
-    // returns array of found companies
+
     return companies;
   }
+
   /** Given searchTerm & max sorts by partial name with max employees
    *
    **/
   static async getNameMax(searchTerm, max) {
-    // SQL query with $1 parameter
     const results = await db.query(
       `SELECT handle,
                 name,
@@ -208,13 +198,13 @@ class Company {
         ORDER BY name`,
       [`%${searchTerm}%`, max]
     );
-    // if db returns something => nameCompanies
+
     const companies = results.rows;
-    // if db returns nothing => error "none found", 400
+
     if (companies.length === 0) {
       throw new NotFoundError(`No companies found with name: ${searchTerm} and min employees ${max}`);
     }
-    // returns array of found companies
+
     return companies;
   }
 
@@ -242,6 +232,7 @@ class Company {
     }
     return minCompanies;
   }
+
   /** given a max, returns companies with max employees
    *
    **/
@@ -265,6 +256,7 @@ class Company {
     }
     return maxCompanies;
   }
+
   /** given a min, max returns companies with range min-max employees
    *
    **/
@@ -288,6 +280,7 @@ class Company {
     }
     return rangeCompanies;
   }
+
   /** given a min, max and name returns companies with range min-max employees containing searchTerm
    *
    **/
@@ -314,7 +307,14 @@ class Company {
     return fullSortCompanies;
   }
 
-  // ATTEMPT 1, and it works, just makes two queries, one against company db and a second against the jobs db this might be expensive and costly time wise
+  // ?ATTEMPT 1, and it works, just makes two queries, one against company db and a second against the jobs db this might be expensive and costly time wise
+  /** given a company handle, return an array of jobs associated with that company_handle.
+   *
+   *=> jobs: [
+    {id, title, salary, equity}, 
+    {id2, title2, salary2, equity2}, ...
+  ]
+   **/
   static async jobs(handle) {
     const results = await db.query(
       `
@@ -339,7 +339,8 @@ WHERE
 
     return companyJobs;
   }
-  // ATTEMPT 2, MANY TO MANY join query, make one query for the company details {handle, name, description, numEmployees, logoUrl, jobs }, jobs =[{id, title, salary, equity}]
+  // TODO correct this to try making one query to include jobs if their in db and not to include if their not, either way one query.
+  // ?ATTEMPT 2, Company.jobs2(handle) NOT IN USE returning all companies with their corresponding jobs as an array of job_ids., MANY TO MANY join query, make one query for the company details {handle, name, description, numEmployees, logoUrl, jobs }, jobs =[{id, title, salary, equity}]
   static async jobs2(handle) {
     const results = await db.query(
       `
@@ -387,5 +388,4 @@ WHERE
   }
 }
 
-// ! RB added end
 module.exports = Company;

@@ -5,7 +5,7 @@ const request = require("supertest");
 const db = require("../db");
 const app = require("../app");
 
-const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, u1Token, u2Token, testToken } = require("./_testCommon");
+const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, testToken } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -26,7 +26,6 @@ describe("POST /jobs", function () {
     title: "newJob",
     company_handle: "c1",
   };
-  // todo leftoff
   const badDataJob = {
     hours: "8a-4p",
   };

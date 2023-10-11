@@ -42,7 +42,6 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
-// ? RB added START
 /** Middleware to use when user must be is_admin.
  *
  * If not, raises Unauthorized.
@@ -63,7 +62,6 @@ function ensureAdmin(req, res, next) {
  *
  * If not, raises Unauthorized.
  */
-
 function loggedInUserOrAdmin(req, res, next) {
   try {
     if (res.locals.user.username === req.params.username) {
@@ -77,8 +75,6 @@ function loggedInUserOrAdmin(req, res, next) {
     return next(err);
   }
 }
-
-// ! RB added END
 
 module.exports = {
   authenticateJWT,

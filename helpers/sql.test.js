@@ -1,7 +1,7 @@
 // TESTS  sqlForPartialUpdate, written by RB - Top to Bottom
 const { sqlForPartialUpdate } = require("./sql.js");
 const db = require("../db");
-// TODO refactor these tests, need to test a failing result, no data or bad col names or malformed data.
+
 describe("tests sqlForPartialUpdate", function () {
   // Declare variables  for testing
   let userDataToUpdate;

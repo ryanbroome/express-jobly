@@ -6,7 +6,7 @@ const db = require("../db.js");
 const app = require("../app");
 const User = require("../models/user");
 
-const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, u1Token, testToken } = require("./_testCommon");
+const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, testToken } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);

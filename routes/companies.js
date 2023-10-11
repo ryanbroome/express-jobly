@@ -1,27 +1,4 @@
 "use strict";
-// ?rb add
-const { SECRET_KEY } = require("../config");
-const jwt = require("jsonwebtoken");
-const { authenticateJWT } = require("../middleware/auth");
-const { createToken } = require("../helpers/tokens");
-
-const adminUser = { username: "adminUser", password: "password", firstName: "first", lastName: "last", email: "test@gmail.com", isAdmin: true };
-const regUser = { username: "regUser", password: "password", firstName: "first", lastName: "last", email: "test@gmail.com", isAdmin: false };
-
-const adminToken = createToken(adminUser);
-const regToken = createToken(regUser);
-const eddyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZHltdW5zdGEiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjk2MjU4NzI0fQ.g1hc8iY_Njv-yrBeMCB1kCWb2GvJKZ7ZyX3ET8UssX0";
-
-console.log("=====\\!=====TOKEN VERIFY====/!======");
-console.log("adminToken => jwt.verify", jwt.verify(adminToken, SECRET_KEY));
-console.log("adminToken", adminToken);
-console.log("regToken => jwt.verify", jwt.verify(regToken, SECRET_KEY));
-console.log("regToken", regToken);
-console.log("eddyToken", jwt.verify(eddyToken, SECRET_KEY));
-// !rb enD
-// ! DELETE BEFORE MOVING ON
-const testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlUxIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTY5NTkxNDE4MX0.rxnNxiHyQshWogJkEVxkIdtEqx3rRMoZU7R39o3KIeU";
-// ?END DELETE BEFORE MOVING ON
 
 /** Routes for companies. */
 const jsonschema = require("jsonschema");
@@ -161,29 +138,5 @@ router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res,
     return next(err);
   }
 });
-
-/** GET / abm/abm async creates a static token
- *
- * **/
-
-// ?RB added start
-// TEST FUNCTION TO PLAY
-router.get("/abm/abm", async function (req, res, next) {
-  try {
-    const userToken = jwt.verify(regToken, SECRET_KEY);
-    console.log("userToken", userToken);
-    if (userToken.username !== "U1") {
-      if (userToken.is_admin !== true) {
-        console.log("userToken.is_admin == true");
-      }
-      res.json(`Hey you are username: ${userToken.username}`);
-    }
-    res.json("you made it, welcome admin");
-  } catch (e) {
-    return next(e);
-  }
-});
-
-// ! RB added end
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const { BadRequestError } = require("../expressError");
 
-// TODO update EXAMPLE with better wording
 /** Returns Set Columns portion of SQL query string and parameterized values
  * Input  ( { data to update } , { js variable names as keys : SQL column names as values } )
  * ( { dataToUpdate } , { jsToSql } )

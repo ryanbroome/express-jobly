@@ -15,8 +15,7 @@ async function commonBeforeAll() {
   await db.query(`DELETE FROM jobs`);
   // noinspection SqlWithoutWhere
   await db.query(`DELETE FROM applications`);
-  // todo left off here, started writing tests for jobs. Start by seeding test db before all tests with what's needed. Then adjust the job.test.js file to reflect testing for jobs rather than companies
-  // TODO Was not reliably passing, adding the Promise.all seemed to stabilize the timing of these returning. Sometimes it returns two admin sometimee it returns U2
+
   Promise.all([
     await Company.create({
       handle: "c1",
@@ -90,14 +89,10 @@ async function commonBeforeAll() {
 
 async function commonBeforeEach() {
   await db.query("BEGIN");
-  const job = await db.query(`SELECT * FROM jobs`);
-  console.log("job.rows BEFORE EACH", job.rows);
 }
 
 async function commonAfterEach() {
   await db.query("ROLLBACK");
-  const job = await db.query(`SELECT * FROM jobs`);
-  console.log("job.rows AFTER EACH AFTER ROLLBACK", job.rows);
 }
 
 async function commonAfterAll() {
