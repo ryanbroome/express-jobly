@@ -274,4 +274,5 @@ ON
     return user;
   }
 }
+
 module.exports = User;

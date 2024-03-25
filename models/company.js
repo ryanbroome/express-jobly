@@ -308,6 +308,7 @@ class Company {
   }
 
   // ?ATTEMPT 1, and it works, just makes two queries, one against company db and a second against the jobs db this might be expensive and costly time wise
+
   /** given a company handle, return an array of jobs associated with that company_handle.
    *
    *=> jobs: [
